@@ -1,120 +1,190 @@
-# 🌸 Glowi — Rhythmic Gymnastics Companion App
+# 🌸 Glowi — Rhythmic Gymnastics Companion
 
-**Glowi** is a modern iOS application designed for parents and coaches of rhythmic gymnasts.
-It helps track training schedules, competitions, payments, and achievements — all in one elegant interface.
-
----
-
-## ✨ Features
-
-### 👩‍👧 Parent Experience
-
-* View child's profile and progress
-* Track training schedule
-* Browse upcoming competitions
-* Monitor payment history
-* Receive notifications about updates
-
-### 🧑‍🏫 Coach / Admin Capabilities
-
-* Add and manage training sessions
-* Create and update events (competitions)
-* Manage payments and statuses
-* Send updates to parents via in-app notifications
+### Track training, events, and progress in one elegant space
 
 ---
 
-## 📱 Screens
+## 🧩 The Problem
 
-* Welcome Screen
-* Dashboard (Overview)
-* Schedule (Training Calendar)
-* Events (Competitions)
-* Payments (Balance & History)
-* Account (Profile & Notifications)
+Parents of young rhythmic gymnasts often struggle to manage:
 
----
+* Training schedules across multiple days
+* Competition timelines
+* Payment tracking
+* Communication with coaches
 
-## 🛠 Tech Stack
-
-* **SwiftUI**
-* **MVVM Architecture**
-* **Combine**
-* **Local JSON (MockData)**
-* **UserDefaults / Local Storage**
-* **Custom UI Components System**
-* **Reusable Design System (Theme.swift)**
+Most existing solutions are fragmented, outdated, or not designed for this niche.
 
 ---
 
-## 🎨 Design Highlights
+## 💡 The Solution
 
-* Soft pastel UI inspired by gymnastics aesthetics
-* Custom gradients and glow effects
-* Component-based UI system (cards, buttons, tab bar)
-* Smooth animations and transitions
-* Clean and scalable layout structure
+**Glowi** is a mobile app that centralizes everything into one clean, intuitive interface:
+
+* Training schedule
+* Competitions & events
+* Payments & history
+* Child progress overview
+* Notifications for updates
+
+Designed specifically for **parents and coaches in rhythmic gymnastics**.
 
 ---
 
-## 🚀 Project Structure
+## 🎯 My Role
+
+**iOS Developer & UI/UX Designer**
+
+* Designed full user experience
+* Built app using SwiftUI
+* Created reusable UI system
+* Implemented MVVM architecture
+* Developed core features and logic
+
+---
+
+## 🧠 Key Features
+
+### 🏠 Dashboard
+
+* Child overview
+* Next training & event
+* Quick actions
+* Clean card-based UI
+
+---
+
+### 📅 Schedule
+
+* Training sessions grouped by time
+* Clear visual hierarchy
+* Easy scanning for parents
+
+---
+
+### 🎉 Events
+
+* Competitions & activities
+* Styled event cards
+* Future filtering (planned)
+
+---
+
+### 💳 Payments
+
+* Balance overview
+* Payment history
+* Status indicators (Paid / Pending)
+* Designed for clarity and trust
+
+---
+
+### 👤 Account
+
+* Parent profile
+* Linked child
+* Notifications system
+* Future: settings & preferences
+
+---
+
+## 🎨 Design Approach
+
+The design focuses on:
+
+* **Soft pastel palette** → friendly & child-oriented
+* **Rounded UI components** → modern and safe feel
+* **Gradients & glow effects** → premium touch
+* **Clear typography hierarchy** → readability
+
+Everything is built using a **custom design system**:
+
+* Theme.swift (colors, spacing, radius)
+* Reusable components (cards, buttons, tab bar)
+
+---
+
+## 🏗 Architecture
+
+* **MVVM pattern**
+* State-driven UI with SwiftUI
+* Modular structure:
 
 ```plaintext
-Glowi_mobile/
-├── Components/
-├── Views/
-├── ViewModels/
-├── Models/
-├── Theme/
-└── Assets/
+Components/
+Views/
+ViewModels/
+Models/
+Theme/
 ```
 
 ---
 
-## 📸 Preview
+## ⚙️ Tech Stack
 
-*(Add screenshots here later)*
-
----
-
-## 🔧 Setup
-
-```bash
-git clone https://github.com/rabbitrunout/Glowi_mobile.git
-```
-
-Open in Xcode:
-
-```bash
-open Glowi_mobile.xcodeproj
-```
-
-Run on simulator 🚀
+* SwiftUI
+* Combine
+* MVVM Architecture
+* Local JSON (MockData)
+* Custom UI Components
+* Local persistence (in progress)
 
 ---
 
-## 📌 Status
+## 🚀 Challenges & Decisions
 
-🟡 In Progress — actively building core features and refining UX
+### 1. Clean UI vs Data Density
+
+Balancing minimal design with real-world information required careful structuring using cards and spacing.
 
 ---
 
-## 💡 Future Improvements
+### 2. Reusable Components
+
+Instead of building screens directly, I created:
+
+* GlowiCard
+* PremiumPrimaryButton
+* Custom TabBar
+
+This improved scalability and consistency.
+
+---
+
+### 3. Role-Based Logic
+
+Introduced separation between:
+
+* Parent (view-only)
+* Coach/Admin (manages data)
+
+---
+
+## 📈 Outcome
+
+* Fully functional multi-screen iOS app
+* Clean and scalable architecture
+* Production-level UI quality
+* Strong portfolio project for mobile roles
+
+---
+
+## 🔮 Next Steps
 
 * Backend integration (Firebase / REST API)
 * Push notifications
-* Role-based authentication
+* Real authentication
+* Payment integration
 * Calendar sync
-* Payment integrations
 
 ---
 
-## 👩‍💻 Author
+## 👩‍💻 About Me
 
 **Irina S.**
 Junior Mobile / Web Developer
 
 📍 Mississauga, ON
-🎯 Open to internships & junior roles
+🎯 Actively seeking internship / junior roles
 
 ---
