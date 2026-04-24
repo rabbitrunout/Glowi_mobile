@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct Glowi_mobileApp: App {
+    @StateObject private var auth = AuthViewModel()
+    @StateObject private var dashboardVM = DashboardViewModel()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(auth)
+                .environmentObject(dashboardVM)
         }
     }
 }
+

@@ -1,0 +1,105 @@
+//
+//  MockData.json
+//  Glowi_mobile
+//
+//  Created by Irina Saf on 2026-04-02.
+//
+
+{
+  "child": {
+    "id": 1,
+    "name": "Kira",
+    "age": 12,
+    "level": "National",
+    "nextTraining": "Apr 5, 5:00 PM"
+  },
+  "events": [
+    {
+      "id": 1,
+      "title": "Koop Cup 2026",
+      "date": "Apr 22",
+      "time": "09:00 AM",
+      "location": "Markham Pan Am Centre",
+      "type": "Competition"
+    },
+    {
+      "id": 2,
+      "title": "Spring Invitational",
+      "date": "May 10",
+      "time": "11:30 AM",
+      "location": "Toronto Gymnastics Hall",
+      "type": "Competition"
+    },
+    {
+      "id": 3,
+      "title": "Club Showcase",
+      "date": "Jun 02",
+      "time": "05:00 PM",
+      "location": "Mississauga Sports Center",
+      "type": "Club Event"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "title": "Flexibility Training",
+      "date": "Apr 5",
+      "time": "5:00 PM",
+      "coach": "Coach Anna"
+    },
+    {
+      "id": 2,
+      "title": "Ribbon Practice",
+      "date": "Apr 7",
+      "time": "6:30 PM",
+      "coach": "Coach Mila"
+    },
+    {
+      "id": 3,
+      "title": "Competition Prep",
+      "date": "Apr 9",
+      "time": "4:30 PM",
+      "coach": "Coach Anna"
+    }
+  ],
+  "payments": [
+    {
+      "id": 1,
+      "month": "January",
+      "amount": "$180",
+      "status": "Paid"
+    },
+    {
+      "id": 2,
+      "month": "February",
+      "amount": "$180",
+      "status": "Paid"
+    },
+    {
+      "id": 3,
+      "month": "March",
+      "amount": "$180",
+      "status": "Pending"
+    }
+  ],
+  "achievements": [
+    {
+      "id": 1,
+      "title": "Aura Cup",
+      "date": "2026-02-14",
+      "place": "1st Place"
+    },
+    {
+      "id": 2,
+      "title": "Winter Classic",
+      "date": "2026-01-20",
+      "place": "2nd Place"
+    },
+    {
+      "id": 3,
+      "title": "Spring Invitational",
+      "date": "2025-12-10",
+      "place": "3rd Place"
+    }
+  ]
+}
