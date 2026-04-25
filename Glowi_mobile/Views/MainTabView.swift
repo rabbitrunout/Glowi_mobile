@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @EnvironmentObject var dashboardVM: DashboardViewModel
     @State private var selectedTab: Tab = .home
 
     var body: some View {
@@ -12,7 +13,10 @@ struct MainTabView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .safeAreaInset(edge: .bottom) {
-            GlowiCustomTabBar(selectedTab: $selectedTab)
+            GlowiCustomTabBar(
+                selectedTab: $selectedTab,
+                unreadCount: dashboardVM.unreadNotificationsCount
+            )
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .padding(.bottom, 10)

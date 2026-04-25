@@ -70,4 +70,13 @@ struct CompetitionChecklistItem: Identifiable, Hashable {
     var isChecked: Bool = false
 }
 
+struct CalendarItem: Identifiable, Hashable {
+    let id: String
+    var title: String
+    var date: String
+    var time: String
+    var subtitle: String
+    var type: String // "training", "competition", "event", "payment"
+    var relatedEventId: Int?
+}
 

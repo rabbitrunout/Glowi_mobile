@@ -1,9 +1,18 @@
 import SwiftUI
 
 struct ScheduleView: View {
-    @EnvironmentObject var auth: AuthViewModel
     @EnvironmentObject var dashboardVM: DashboardViewModel
-    
+    @State private var selectedDay: String = "22"
+
+    private let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+    private let calendarRows: [[String]] = [
+        ["30", "31", "1", "2", "3", "4", "5"],
+        ["6", "7", "8", "9", "10", "11", "12"],
+        ["13", "14", "15", "16", "17", "18", "19"],
+        ["20", "21", "22", "23", "24", "25", "26"],
+        ["27", "28", "29", "30", "", "", ""]
+    ]
 
     var body: some View {
         ZStack {
@@ -13,9 +22,9 @@ struct ScheduleView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     headerSection
-                    thisWeekSection
-                    nextWeekSection
-                    addToCalendarButton
+                    calendarCard
+                    selectedDaySection
+                    legendSection
                 }
                 .padding(.horizontal, Theme.screenPadding)
                 .padding(.top, 10)
@@ -30,29 +39,48 @@ struct ScheduleView: View {
 private extension ScheduleView {
     var headerSection: some View {
         GlowiScreenHeader(
-            title: "Schedule",
-            subtitle: "Training plan and recent sessions"
+            title: "Calendar",
+            subtitle: "Training, competitions, and payment deadlines"
         )
     }
 }
 
-// MARK: - Sections
+// MARK: - Calendar
 private extension ScheduleView {
-    var thisWeekSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("This Week")
+    var calendarCard: some View {
+        GlowiCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("April 2026")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(Theme.textPrimary)
 
-            if upcomingSessions.isEmpty {
-                GlowiEmptyState(
-                    icon: "calendar",
-                    title: "No sessions this week",
-                    message: "New training sessions will appear here."
-                )
-            } else {
+                    Spacer()
+
+                    Text("Today")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Theme.primaryButtonGradient)
+                        .clipShape(Capsule())
+                }
+
+                HStack(spacing: 6) {
+                    ForEach(days, id: \.self) { day in
+                        Text(day)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Theme.textSecondary)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+
                 VStack(spacing: 10) {
-                    ForEach(upcomingSessions) { session in
-                        PressableScheduleRow {
-                            sessionRow(session, accent: Theme.blueDark, isDone: false)
+                    ForEach(calendarRows, id: \.self) { row in
+                        HStack(spacing: 8) {
+                            ForEach(row, id: \.self) { day in
+                                calendarCell(day)
+                            }
                         }
                     }
                 }
@@ -60,76 +88,105 @@ private extension ScheduleView {
         }
     }
 
-    var nextWeekSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("Next Week")
+    func calendarCell(_ day: String) -> some View {
+        let isSelected = selectedDay == day
+        let items = dashboardVM.calendarItems(for: day)
 
-            if nextWeekSessions.isEmpty {
-                GlowiEmptyState(
-                    icon: "calendar.badge.plus",
-                    title: "No sessions planned",
-                    message: "Next week’s training schedule will appear here."
-                )
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(nextWeekSessions) { session in
-                        PressableScheduleRow {
-                            sessionRow(session, accent: Theme.greenDark, isDone: true)
-                        }
-                    }
+        return Button {
+            if !day.isEmpty {
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
+                    selectedDay = day
                 }
             }
-        }
-    }
+        } label: {
+            VStack(spacing: 6) {
+                Text(day)
+                    .font(.system(size: 14, weight: isSelected ? .bold : .medium))
+                    .foregroundColor(day.isEmpty ? .clear : Theme.textPrimary)
 
-    func sectionTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 18, weight: .bold))
-            .foregroundColor(Theme.textPrimary)
-            .padding(.top, 2)
+                HStack(spacing: 3) {
+                    ForEach(items.prefix(3)) { item in
+                        Circle()
+                            .fill(dotColor(for: item.type))
+                            .frame(width: 5, height: 5)
+                    }
+                }
+                .frame(height: 7)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(isSelected ? AnyShapeStyle(Theme.accentGradient) : AnyShapeStyle(Color.white.opacity(0.65)))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isSelected ? Color.white.opacity(0.9) : Theme.stroke, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(day.isEmpty)
     }
 }
 
-// MARK: - Row
+// MARK: - Selected Day
 private extension ScheduleView {
-    func sessionRow(_ session: TrainingSession, accent: Color, isDone: Bool) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+    var selectedDaySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("Apr \(selectedDay)")
+
+            let items = dashboardVM.calendarItems(for: selectedDay)
+
+            if items.isEmpty {
+                GlowiEmptyState(
+                    icon: "calendar",
+                    title: "Nothing planned",
+                    message: "No training, events, or payment deadlines for this day."
+                )
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(items) { item in
+                        calendarItemRow(item)
+                    }
+                }
+            }
+        }
+    }
+
+    func calendarItemRow(_ item: CalendarItem) -> some View {
+        HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(accent.opacity(0.16))
-                    .frame(width: 46, height: 46)
+                    .fill(dotColor(for: item.type).opacity(0.16))
+                    .frame(width: 48, height: 48)
 
-                Image(systemName: isDone ? "checkmark.circle.fill" : "calendar")
+                Image(systemName: icon(for: item.type))
                     .font(.system(size: 19, weight: .semibold))
-                    .foregroundColor(accent)
+                    .foregroundColor(dotColor(for: item.type))
             }
 
             VStack(alignment: .leading, spacing: 5) {
-                Text(session.title)
+                Text(item.title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Theme.textPrimary)
 
-                Text("\(session.date) • \(session.time)")
+                Text(item.time.isEmpty ? item.subtitle : "\(item.time) • \(item.subtitle)")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Theme.textSecondary)
-
-                Text(session.coach)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
+                    .lineLimit(2)
             }
 
             Spacer()
 
-            Text(isDone ? "Done" : "60 min")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(accent)
+            Text(label(for: item.type))
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(dotColor(for: item.type))
                 .padding(.horizontal, 10)
                 .padding(.vertical, 7)
-                .background(accent.opacity(0.13))
+                .background(dotColor(for: item.type).opacity(0.13))
                 .clipShape(Capsule())
         }
         .padding(14)
-        .frame(maxWidth: .infinity)
         .background(Theme.elevatedSurface)
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -139,48 +196,84 @@ private extension ScheduleView {
     }
 }
 
-// MARK: - Button
+// MARK: - Legend
 private extension ScheduleView {
-    var addToCalendarButton: some View {
-        Group {
-            if auth.isAdmin {
-                PremiumPrimaryButton(title: "Add to Calendar", icon: "plus.circle") {
-                    dashboardVM.addSession()
+    var legendSection: some View {
+        GlowiCard {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionTitle("Legend")
+
+                HStack(spacing: 14) {
+                    legendDot("Training", color: Theme.blueDark)
+                    legendDot("Competition", color: Theme.pinkDark)
+                    legendDot("Payment", color: Theme.yellowDark)
                 }
-                .padding(.top, 6)
             }
+        }
+    }
+
+    func legendDot(_ title: String, color: Color) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 9, height: 9)
+
+            Text(title)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(Theme.textSecondary)
         }
     }
 }
 
 // MARK: - Helpers
 private extension ScheduleView {
-    var upcomingSessions: [TrainingSession] {
-        Array(dashboardVM.sessions.prefix(3))
+    func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 18, weight: .bold))
+            .foregroundColor(Theme.textPrimary)
     }
 
-    var nextWeekSessions: [TrainingSession] {
-        Array(dashboardVM.sessions.dropFirst(3))
+    func dotColor(for type: String) -> Color {
+        switch type {
+        case "training":
+            return Theme.blueDark
+        case "competition", "event":
+            return Theme.pinkDark
+        case "payment":
+            return Theme.yellowDark
+        default:
+            return Theme.textSecondary
+        }
     }
-}
 
-// MARK: - Pressable Row
-private struct PressableScheduleRow<Content: View>: View {
-    @ViewBuilder let content: Content
-    @State private var isPressed = false
+    func icon(for type: String) -> String {
+        switch type {
+        case "training":
+            return "figure.gymnastics"
+        case "competition":
+            return "star.fill"
+        case "event":
+            return "calendar.badge.plus"
+        case "payment":
+            return "creditcard.fill"
+        default:
+            return "calendar"
+        }
+    }
 
-    var body: some View {
-        content
-            .scaleEffect(isPressed ? 0.99 : 1)
-            .animation(.spring(response: 0.22, dampingFraction: 0.84), value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        if !isPressed { isPressed = true }
-                    }
-                    .onEnded { _ in
-                        isPressed = false }
-            )
+    func label(for type: String) -> String {
+        switch type {
+        case "training":
+            return "Training"
+        case "competition":
+            return "Competition"
+        case "event":
+            return "Event"
+        case "payment":
+            return "Payment"
+        default:
+            return "Item"
+        }
     }
 }
 

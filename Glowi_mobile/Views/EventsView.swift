@@ -92,54 +92,97 @@ private extension EventsView {
 // MARK: - Row
 private extension EventsView {
     func eventRow(_ event: Event, accent: Color, isDone: Bool) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(accent.opacity(0.16))
-                    .frame(width: 46, height: 46)
+        VStack(alignment: .leading, spacing: 10) {
 
-                Image(systemName: isDone ? "checkmark.seal.fill" : "star.fill")
-                    .font(.system(size: 19, weight: .semibold))
+            // TOP ROW
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(accent.opacity(0.16))
+                        .frame(width: 46, height: 46)
+
+                    Image(systemName: isDone ? "checkmark.seal.fill" : "star.fill")
+                        .foregroundColor(accent)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(event.title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Theme.textPrimary)
+
+                    Text("\(event.date) • \(event.time)")
+                        .font(.system(size: 12))
+                        .foregroundColor(Theme.textSecondary)
+
+                    Text(event.location)
+                        .font(.system(size: 12))
+                        .foregroundColor(Theme.textSecondary)
+                }
+
+                Spacer()
+
+                Text(isDone ? "Done" : event.type)
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(accent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(accent.opacity(0.15))
+                    .clipShape(Capsule())
             }
 
-            VStack(alignment: .leading, spacing: 5) {
-                Text(event.title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Theme.textPrimary)
+            // 💳 PAYMENT BLOCK
+            if let payment = dashboardVM.paymentForEvent(event.id) {
 
-                Text("\(event.date) • \(event.time)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
+                Divider().opacity(0.2)
 
-                Text(event.location)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
-                    .lineLimit(1)
+                HStack {
+                    Text(payment.amount)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(Theme.textPrimary)
+
+                    Spacer()
+
+                    Text(payment.status)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(
+                            payment.status == "Paid"
+                            ? Theme.greenDark
+                            : Theme.warning
+                        )
+                }
+
+                HStack {
+                    Text("Due: \(payment.dueDate)")
+                        .font(.system(size: 11))
+                        .foregroundColor(Theme.textSecondary)
+
+                    Spacer()
+
+                    if payment.status != "Paid" {
+                        Button {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                dashboardVM.payForEvent(event.id)
+                            }
+                        } label: {
+                            Text("Pay Now")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Theme.primaryButtonGradient)
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
             }
-
-            Spacer()
-
-            Text(isDone ? "Done" : event.type)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(accent)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(accent.opacity(0.13))
-                .clipShape(Capsule())
         }
         .padding(14)
-        .frame(maxWidth: .infinity)
         .background(rowBackground(isDone: isDone))
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 16)
                 .stroke(Theme.stroke, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    func rowBackground(isDone: Bool) -> Color {
-        isDone ? Theme.lavender.opacity(0.22) : Theme.pink.opacity(0.24)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -150,6 +193,9 @@ private extension EventsView {
             dashboardVM.addEvent()
         }
         .padding(.top, 6)
+    }
+    func rowBackground(isDone: Bool) -> Color {
+        isDone ? Theme.lavender.opacity(0.22) : Theme.pink.opacity(0.24)
     }
 }
 

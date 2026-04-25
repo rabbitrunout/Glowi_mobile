@@ -14,6 +14,7 @@ struct ParentProfileView: View {
                     headerSection
                     parentCard
                     childCard
+                    notificationsSection
                     actionsSection
                     logoutButton
                 }
@@ -23,6 +24,9 @@ struct ParentProfileView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            dashboardVM.markNotificationsAsRead()
+        }
     }
 }
 
@@ -34,6 +38,91 @@ private extension ParentProfileView {
             subtitle: "Parent profile and linked gymnast"
         )
     }
+    
+    var notificationsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("Notifications")
+
+            if dashboardVM.notifications.isEmpty {
+                GlowiEmptyState(
+                    icon: "bell",
+                    title: "No notifications",
+                    message: "Payment and schedule updates will appear here."
+                )
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(dashboardVM.notifications.prefix(3)) { notification in
+                        notificationRow(notification)
+                    }
+                }
+            }
+        }
+    }
+
+    func notificationRow(_ notification: GlowiNotification) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(notificationColor(notification.type).opacity(0.16))
+                    .frame(width: 46, height: 46)
+
+                Image(systemName: notificationIcon(notification.type))
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(notificationColor(notification.type))
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(notification.title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Theme.textPrimary)
+
+                Text(notification.message)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Theme.textSecondary)
+                    .lineLimit(2)
+
+                Text(notification.date)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(Theme.textMuted)
+            }
+
+            Spacer()
+        }
+        .padding(14)
+        .background(Theme.elevatedSurface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    func notificationColor(_ type: String) -> Color {
+        switch type {
+        case "payment":
+            return Theme.yellowDark
+        case "event":
+            return Theme.pinkDark
+        case "session":
+            return Theme.blueDark
+        default:
+            return Theme.textSecondary
+        }
+    }
+
+    func notificationIcon(_ type: String) -> String {
+        switch type {
+        case "payment":
+            return "creditcard.fill"
+        case "event":
+            return "calendar.badge.plus"
+        case "session":
+            return "figure.gymnastics"
+        default:
+            return "bell.fill"
+        }
+    }
+    
 }
 
 // MARK: - Parent

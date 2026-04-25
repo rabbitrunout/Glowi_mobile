@@ -2,6 +2,8 @@ import SwiftUI
 
 struct GlowiCustomTabBar: View {
     @Binding var selectedTab: Tab
+    var unreadCount: Int = 0
+
     @State private var animatedTab: Tab?
 
     var body: some View {
@@ -50,14 +52,27 @@ struct GlowiCustomTabBar: View {
                             y: 4
                         )
 
-                    Image(tab.assetName)
-                        .resizable()
-                        .renderingMode(.original)
-                        .scaledToFit()
-                        .frame(width: isActive ? 26 : 24, height: isActive ? 26 : 24)
-                        .opacity(isActive ? 1.0 : 0.5)
-                        .scaleEffect(isAnimating ? 1.18 : (isActive ? 1.05 : 1.0))
-                        .offset(y: isAnimating ? -4 : 0)
+                    ZStack(alignment: .topTrailing) {
+                        Image(tab.assetName)
+                            .resizable()
+                            .renderingMode(.original)
+                            .scaledToFit()
+                            .frame(width: isActive ? 26 : 24, height: isActive ? 26 : 24)
+                            .opacity(isActive ? 1.0 : 0.6)
+                            .scaleEffect(isAnimating ? 1.18 : (isActive ? 1.05 : 1.0))
+                            .offset(y: isAnimating ? -4 : 0)
+
+                        if tab == .account && unreadCount > 0 {
+                            Circle()
+                                .fill(Theme.error)
+                                .frame(width: 10, height: 10)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 1.5)
+                                )
+                                .offset(x: 6, y: -6)
+                        }
+                    }
                 }
 
                 Text(tab.title)
@@ -85,9 +100,12 @@ struct GlowiCustomTabBar: View {
                 VStack {
                     Spacer()
 
-                    GlowiCustomTabBar(selectedTab: $selectedTab)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 12)
+                    GlowiCustomTabBar(
+                        selectedTab: $selectedTab,
+                        unreadCount: 2
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
                 }
             }
         }
