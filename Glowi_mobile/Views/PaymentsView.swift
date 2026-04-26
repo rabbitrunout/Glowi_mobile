@@ -2,7 +2,10 @@ import SwiftUI
 
 struct PaymentsView: View {
     @EnvironmentObject var dashboardVM: DashboardViewModel
+
     @State private var animatedBalance: Double = 0
+    @State private var selectedPayment: Payment?
+    @State private var showSuccessToast = false
 
     var body: some View {
         ZStack {
@@ -13,17 +16,44 @@ struct PaymentsView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     headerSection
                     balanceCard
-                    historySection
+                    trainingSection
+                    competitionSection
                     downloadInvoicesButton
                 }
                 .padding(.horizontal, Theme.screenPadding)
                 .padding(.top, 10)
                 .padding(.bottom, 120)
             }
+
+            if showSuccessToast {
+                VStack {
+                    Spacer()
+                    successToast
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 110)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
         }
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             animateBalance()
+        }
+        .sheet(item: $selectedPayment) { payment in
+            ConfirmPaymentSheet(payment: payment) {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    dashboardVM.payPayment(payment.id)
+                    selectedPayment = nil
+                    showSuccessToast = true
+                    animateBalance()
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        showSuccessToast = false
+                    }
+                }
+            }
         }
     }
 }
@@ -31,55 +61,20 @@ struct PaymentsView: View {
 // MARK: - Header
 private extension PaymentsView {
     var headerSection: some View {
-        HStack {
-            Button { } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(Theme.textPrimary)
-                    .frame(width: 42, height: 42)
-                    .background(Color.white.opacity(0.72))
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Theme.stroke, lineWidth: 1)
-                    )
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            Text("Payments")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(Theme.textPrimary)
-
-            Spacer()
-
-            Button { } label: {
-                Image(systemName: "doc.text")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Theme.blueDark)
-                    .frame(width: 42, height: 42)
-                    .background(Color.white.opacity(0.72))
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Theme.stroke, lineWidth: 1)
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.bottom, 4)
+        Text("Payments")
+            .font(.system(size: 24, weight: .bold))
+            .foregroundColor(Theme.textPrimary)
     }
 }
 
 // MARK: - Balance
 private extension PaymentsView {
     var balanceCard: some View {
-        HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Balance")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color.white.opacity(0.88))
+        HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Total Payments")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white.opacity(0.85))
 
                 Text("$\(Int(animatedBalance))")
                     .font(.system(size: 32, weight: .bold))
@@ -89,20 +84,15 @@ private extension PaymentsView {
 
             Spacer()
 
-            Button { } label: {
-                Text("Top up")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Theme.textPrimary)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.92))
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(Theme.stroke, lineWidth: 1)
-                    )
+            VStack(alignment: .trailing, spacing: 6) {
+                Text("\(pendingPayments.count)")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Pending")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.82))
             }
-            .buttonStyle(.plain)
         }
         .padding(18)
         .frame(maxWidth: .infinity)
@@ -113,103 +103,121 @@ private extension PaymentsView {
     }
 }
 
-// MARK: - History
+// MARK: - Training
 private extension PaymentsView {
-    var historySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("History")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(Theme.textPrimary)
-                .padding(.top, 2)
+    var trainingSection: some View {
+        paymentSection(
+            title: "Training Payments",
+            payments: trainingPayments,
+            emptyTitle: "No training payments",
+            emptyMessage: "Monthly payments will appear here."
+        )
+    }
 
-            if dashboardVM.payments.isEmpty {
+    var competitionSection: some View {
+        paymentSection(
+            title: "Competition Fees",
+            payments: competitionPayments,
+            emptyTitle: "No competition fees",
+            emptyMessage: "Competition payment requests will appear here."
+        )
+    }
+
+    func paymentSection(
+        title: String,
+        payments: [Payment],
+        emptyTitle: String,
+        emptyMessage: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle(title)
+
+            if payments.isEmpty {
                 GlowiEmptyState(
                     icon: "creditcard",
-                    title: "No payments yet",
-                    message: "Payment history will appear here."
+                    title: emptyTitle,
+                    message: emptyMessage
                 )
             } else {
                 VStack(spacing: 10) {
-                    ForEach(dashboardVM.payments) { payment in
+                    ForEach(payments) { payment in
                         paymentRow(payment)
                     }
                 }
             }
         }
     }
+}
 
+// MARK: - Rows
+private extension PaymentsView {
     func paymentRow(_ payment: Payment) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        let urgency = dashboardVM.paymentUrgency(for: payment)
+        let urgencyColor = dashboardVM.paymentUrgencyColor(for: urgency)
+
+        return HStack(alignment: .center, spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(urgencyColor.opacity(0.16))
+                    .frame(width: 46, height: 46)
+
+                Image(systemName: paymentIcon(for: payment))
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(urgencyColor)
+            }
+
             VStack(alignment: .leading, spacing: 5) {
                 Text(payment.month)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
-
-                Text(paymentTitle(for: payment))
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(Theme.textPrimary)
 
-                Text(paymentSubtitle(for: payment))
+                Text(payment.category == "competition" ? "Competition fee" : "Monthly training")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Theme.textSecondary)
+
+                Text("Due: \(payment.dueDate)")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(Theme.textMuted)
             }
 
             Spacer()
 
-            VStack(alignment: .trailing, spacing: 5) {
-                Text(amountText(for: payment))
+            VStack(alignment: .trailing, spacing: 6) {
+                Text(payment.amount)
                     .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(statusColor(for: payment.status))
+                    .foregroundColor(Theme.textPrimary)
 
-                Text(payment.status.capitalized)
+                Text(urgency)
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(statusColor(for: payment.status))
+                    .foregroundColor(urgencyColor)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(urgencyColor.opacity(0.13))
+                    .clipShape(Capsule())
+
+                if payment.status.lowercased() != "paid" {
+                    Button {
+                        selectedPayment = payment
+                    } label: {
+                        Text("Pay Now")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Theme.primaryButtonGradient)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
         .padding(14)
-        .frame(maxWidth: .infinity)
-        .background(rowBackground(for: payment.status))
+        .background(rowBackground(for: urgency))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.white.opacity(0.65), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-
-    func paymentTitle(for payment: Payment) -> String {
-        payment.status.lowercased() == "paid" ? "Monthly Training" : "Competition Fee"
-    }
-
-    func paymentSubtitle(for payment: Payment) -> String {
-        payment.status.lowercased() == "paid" ? "Payment received" : "Waiting for payment"
-    }
-
-    func amountText(for payment: Payment) -> String {
-        let clean = payment.amount.replacingOccurrences(of: "$", with: "")
-        let prefix = payment.status.lowercased() == "paid" ? "+ " : "- "
-        return "\(prefix)$\(clean)"
-    }
-
-    func statusColor(for status: String) -> Color {
-        switch status.lowercased() {
-        case "paid":
-            return Theme.greenDark
-        case "pending":
-            return Theme.pinkDark
-        default:
-            return Theme.textPrimary
-        }
-    }
-
-    func rowBackground(for status: String) -> Color {
-        switch status.lowercased() {
-        case "paid":
-            return Theme.green.opacity(0.42)
-        case "pending":
-            return Theme.pink.opacity(0.28)
-        default:
-            return Theme.softSurface
-        }
     }
 }
 
@@ -234,10 +242,73 @@ private extension PaymentsView {
         .buttonStyle(.plain)
         .padding(.top, 6)
     }
+
+    var successToast: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(Theme.greenDark)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Payment completed")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(Theme.textPrimary)
+
+                Text("Your payment is now marked as paid.")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Theme.textSecondary)
+            }
+
+            Spacer()
+        }
+        .padding(14)
+        .background(Theme.card.opacity(0.96))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: Theme.shadow.opacity(0.8), radius: 14, x: 0, y: 8)
+    }
 }
 
 // MARK: - Helpers
 private extension PaymentsView {
+    var trainingPayments: [Payment] {
+        dashboardVM.payments.filter { $0.category == "training" }
+    }
+
+    var competitionPayments: [Payment] {
+        dashboardVM.payments.filter { $0.category == "competition" }
+    }
+
+    var pendingPayments: [Payment] {
+        dashboardVM.payments.filter { $0.status.lowercased() != "paid" }
+    }
+
+    func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 18, weight: .bold))
+            .foregroundColor(Theme.textPrimary)
+    }
+
+    func paymentIcon(for payment: Payment) -> String {
+        payment.category == "competition" ? "star.fill" : "calendar"
+    }
+
+    func rowBackground(for urgency: String) -> Color {
+        switch urgency {
+        case "Paid":
+            return Theme.green.opacity(0.34)
+        case "Overdue":
+            return Theme.error.opacity(0.26)
+        case "Due soon":
+            return Theme.yellow.opacity(0.28)
+        default:
+            return Theme.pink.opacity(0.22)
+        }
+    }
+
     func animateBalance() {
         let total = dashboardVM.payments.compactMap {
             Double($0.amount.replacingOccurrences(of: "$", with: ""))
@@ -250,6 +321,22 @@ private extension PaymentsView {
         }
     }
 }
+
+
+
+    func checkoutRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Theme.textSecondary)
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(Theme.textPrimary)
+        }
+    }
 
 #Preview {
     NavigationStack {

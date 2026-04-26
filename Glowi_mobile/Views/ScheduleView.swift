@@ -2,7 +2,9 @@ import SwiftUI
 
 struct ScheduleView: View {
     @EnvironmentObject var dashboardVM: DashboardViewModel
+
     @State private var selectedDay: String = "22"
+    @State private var showPaymentSuccess = false
 
     private let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
@@ -30,12 +32,24 @@ struct ScheduleView: View {
                 .padding(.top, 10)
                 .padding(.bottom, 120)
             }
+
+            if showPaymentSuccess {
+                VStack {
+                    Spacer()
+
+                    paymentSuccessToast
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 110)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
         }
         .toolbar(.hidden, for: .navigationBar)
     }
 }
 
 // MARK: - Header
+
 private extension ScheduleView {
     var headerSection: some View {
         GlowiScreenHeader(
@@ -46,6 +60,7 @@ private extension ScheduleView {
 }
 
 // MARK: - Calendar
+
 private extension ScheduleView {
     var calendarCard: some View {
         GlowiCard {
@@ -93,10 +108,10 @@ private extension ScheduleView {
         let items = dashboardVM.calendarItems(for: day)
 
         return Button {
-            if !day.isEmpty {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
-                    selectedDay = day
-                }
+            guard !day.isEmpty else { return }
+
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
+                selectedDay = day
             }
         } label: {
             VStack(spacing: 6) {
@@ -117,7 +132,11 @@ private extension ScheduleView {
             .frame(height: 52)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(isSelected ? AnyShapeStyle(Theme.accentGradient) : AnyShapeStyle(Color.white.opacity(0.65)))
+                    .fill(
+                        isSelected
+                        ? AnyShapeStyle(Theme.accentGradient)
+                        : AnyShapeStyle(Color.white.opacity(0.65))
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -130,6 +149,7 @@ private extension ScheduleView {
 }
 
 // MARK: - Selected Day
+
 private extension ScheduleView {
     var selectedDaySection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -169,6 +189,7 @@ private extension ScheduleView {
                 Text(item.title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Theme.textPrimary)
+                    .lineLimit(1)
 
                 Text(item.time.isEmpty ? item.subtitle : "\(item.time) • \(item.subtitle)")
                     .font(.system(size: 12, weight: .medium))
@@ -178,13 +199,39 @@ private extension ScheduleView {
 
             Spacer()
 
-            Text(label(for: item.type))
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(dotColor(for: item.type))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(dotColor(for: item.type).opacity(0.13))
-                .clipShape(Capsule())
+            VStack(alignment: .trailing, spacing: 6) {
+                Text(label(for: item.type))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(dotColor(for: item.type))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(dotColor(for: item.type).opacity(0.13))
+                    .clipShape(Capsule())
+
+                if item.type == "payment", let eventId = item.relatedEventId {
+                    Button {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                            dashboardVM.payForEvent(eventId)
+                            showPaymentSuccess = true
+                        }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                showPaymentSuccess = false
+                            }
+                        }
+                    } label: {
+                        Text("Pay Now")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Theme.primaryButtonGradient)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
         .padding(14)
         .background(Theme.elevatedSurface)
@@ -196,7 +243,40 @@ private extension ScheduleView {
     }
 }
 
+// MARK: - Toast
+
+private extension ScheduleView {
+    var paymentSuccessToast: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(Theme.greenDark)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Payment completed")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(Theme.textPrimary)
+
+                Text("The fee is now marked as paid.")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Theme.textSecondary)
+            }
+
+            Spacer()
+        }
+        .padding(14)
+        .background(Theme.card.opacity(0.96))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Theme.stroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: Theme.shadow.opacity(0.8), radius: 14, x: 0, y: 8)
+    }
+}
+
 // MARK: - Legend
+
 private extension ScheduleView {
     var legendSection: some View {
         GlowiCard {
@@ -226,6 +306,7 @@ private extension ScheduleView {
 }
 
 // MARK: - Helpers
+
 private extension ScheduleView {
     func sectionTitle(_ title: String) -> some View {
         Text(title)

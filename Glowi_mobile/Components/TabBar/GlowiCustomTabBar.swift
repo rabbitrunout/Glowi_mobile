@@ -63,14 +63,19 @@ struct GlowiCustomTabBar: View {
                             .offset(y: isAnimating ? -4 : 0)
 
                         if tab == .account && unreadCount > 0 {
-                            Circle()
-                                .fill(Theme.error)
-                                .frame(width: 10, height: 10)
+                            Text(unreadCount > 9 ? "9+" : "\(unreadCount)")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: unreadCount > 9 ? 20 : 16, height: 16)
+                                .background(Theme.error)
+                                .clipShape(Capsule())
                                 .overlay(
-                                    Circle()
+                                    Capsule()
                                         .stroke(Color.white, lineWidth: 1.5)
                                 )
-                                .offset(x: 6, y: -6)
+                                .offset(x: 10, y: -8)
+                                .transition(.scale.combined(with: .opacity))
+                                .animation(.spring(response: 0.25, dampingFraction: 0.75), value: unreadCount)
                         }
                     }
                 }

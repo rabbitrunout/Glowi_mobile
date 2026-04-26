@@ -28,6 +28,7 @@ struct ParentProfileView: View {
             dashboardVM.markNotificationsAsRead()
         }
     }
+    
 }
 
 // MARK: - Header
@@ -220,6 +221,8 @@ private extension ParentProfileView {
                 actionRow(title: "Schedule", assetName: "icon_schedule", accent: Theme.blueDark)
                 actionRow(title: "Events", assetName: "icon_events", accent: Theme.pinkDark)
                 actionRow(title: "Account Settings", assetName: "icon_account", accent: Theme.lavender)
+
+                resetDemoButton
             }
         }
     }
@@ -334,6 +337,46 @@ private struct ProfileCard<Content: View>: View {
                 .stroke(Theme.stroke, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+}
+
+private extension ParentProfileView {
+
+    var resetDemoButton: some View {
+        Button {
+            dashboardVM.resetDemoData()
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Theme.error.opacity(0.16))
+                        .frame(width: 42, height: 42)
+
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundColor(Theme.error)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Reset Demo Data")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Theme.textPrimary)
+
+                    Text("Restore original app state")
+                        .font(.system(size: 12))
+                        .foregroundColor(Theme.textSecondary)
+                }
+
+                Spacer()
+            }
+            .padding(14)
+            .background(Theme.elevatedSurface)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Theme.stroke, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
     }
 }
 
