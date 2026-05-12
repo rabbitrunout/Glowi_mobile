@@ -1,190 +1,174 @@
-# 🌸 Glowi — Rhythmic Gymnastics Companion
+# ✨ Glowi — Rhythmic Gymnastics Companion App
 
-### Track training, events, and progress in one elegant space
+### iOS App · SwiftUI · MVVM
 
----
-
-## 🧩 The Problem
-
-Parents of young rhythmic gymnasts often struggle to manage:
-
-* Training schedules across multiple days
-* Competition timelines
-* Payment tracking
-* Communication with coaches
-
-Most existing solutions are fragmented, outdated, or not designed for this niche.
+📍 Mississauga, ON, Canada
 
 ---
 
-## 💡 The Solution
+## 📱 Overview
 
-**Glowi** is a mobile app that centralizes everything into one clean, intuitive interface:
+**Glowi** is a modern iOS application designed for parents of rhythmic gymnasts to manage their child’s training, events, payments, and progress — all in one place.
 
-* Training schedule
-* Competitions & events
-* Payments & history
-* Child progress overview
-* Notifications for updates
-
-Designed specifically for **parents and coaches in rhythmic gymnastics**.
+The app focuses on **clarity, structure, and real-world usability**, simulating a production-ready environment with role-based logic and scalable architecture.
 
 ---
 
-## 🎯 My Role
+## 🚀 Key Features
 
-**iOS Developer & UI/UX Designer**
+### 👨‍👩‍👧 Parent Dashboard
 
-* Designed full user experience
-* Built app using SwiftUI
-* Created reusable UI system
-* Implemented MVVM architecture
-* Developed core features and logic
+* Overview of training sessions, competitions, and upcoming events
+* Real-time status indicators (completed, upcoming)
+* Smart UI states (empty, loading, success)
 
 ---
 
-## 🧠 Key Features
+### 👧 Multi-Child Support
 
-### 🏠 Dashboard
-
-* Child overview
-* Next training & event
-* Quick actions
-* Clean card-based UI
+* Add and manage multiple children
+* Switch between profiles
+* Independent tracking per child
 
 ---
 
-### 📅 Schedule
+### 🧾 Payments System
 
-* Training sessions grouped by time
-* Clear visual hierarchy
-* Easy scanning for parents
-
----
-
-### 🎉 Events
-
-* Competitions & activities
-* Styled event cards
-* Future filtering (planned)
+* View upcoming and completed payments
+* “Pay Now” flow with confirmation sheet
+* Status tracking (Paid / Pending)
+* Mock checkout experience (production-ready structure)
 
 ---
 
-### 💳 Payments
+### 📅 Calendar & Events
 
-* Balance overview
-* Payment history
-* Status indicators (Paid / Pending)
-* Designed for clarity and trust
-
----
-
-### 👤 Account
-
-* Parent profile
-* Linked child
-* Notifications system
-* Future: settings & preferences
+* Event list with detailed info
+* Competition-specific UI
+* Inline payment integration inside events
 
 ---
 
-## 🎨 Design Approach
+### 🔔 Notifications
 
-The design focuses on:
+* Payment reminders
+* Event updates
+* Account-related alerts
+* Auto-mark as read
 
-* **Soft pastel palette** → friendly & child-oriented
-* **Rounded UI components** → modern and safe feel
-* **Gradients & glow effects** → premium touch
-* **Clear typography hierarchy** → readability
+---
 
-Everything is built using a **custom design system**:
+### 👤 Account & Profile
 
-* Theme.swift (colors, spacing, radius)
-* Reusable components (cards, buttons, tab bar)
+* Parent profile screen
+* Add/Edit child profiles
+* Reset demo data (for testing)
+
+---
+
+## 🧠 Product-Level Logic
+
+### 🔐 Role-Based Behavior (Real-World UX)
+
+* Parents **cannot edit athlete level**
+* New child profiles are created with:
+
+```text
+Level: Pending coach approval
+```
+
+* Level is intended to be assigned by **coach/admin role**
+
+---
+
+### 💡 Why this matters
+
+This mirrors real sports systems where:
+
+* Athlete classification is controlled by professionals
+* Parents manage logistics, not performance tiers
+
+---
+
+## 🎨 UI/UX Highlights
+
+* Custom design system (`Theme`)
+* Gradient-based premium interface
+* Reusable components (cards, buttons, badges)
+* Smooth animations and transitions
+* Empty states and micro-interactions
 
 ---
 
 ## 🏗 Architecture
 
-* **MVVM pattern**
-* State-driven UI with SwiftUI
+* **SwiftUI + MVVM**
+* State-driven UI with `@Published`
+* Local persistence via JSON (MockData)
 * Modular structure:
 
-```plaintext
-Components/
-Views/
-ViewModels/
-Models/
-Theme/
-```
+  * Views
+  * ViewModels
+  * Models
+  * Components
 
 ---
 
-## ⚙️ Tech Stack
+## 🧪 Demo Mode
 
+The app uses mock data to simulate real usage.
+
+### Reset Feature:
+
+* Restore initial data
+* Useful for testing flows and UI states
+
+---
+
+## 📦 Tech Stack
+
+* Swift
 * SwiftUI
-* Combine
 * MVVM Architecture
-* Local JSON (MockData)
-* Custom UI Components
-* Local persistence (in progress)
+* Combine (via ObservableObject)
+* Local JSON data storage
 
 ---
 
-## 🚀 Challenges & Decisions
+## 🔮 Future Improvements
 
-### 1. Clean UI vs Data Density
-
-Balancing minimal design with real-world information required careful structuring using cards and spacing.
-
----
-
-### 2. Reusable Components
-
-Instead of building screens directly, I created:
-
-* GlowiCard
-* PremiumPrimaryButton
-* Custom TabBar
-
-This improved scalability and consistency.
-
----
-
-### 3. Role-Based Logic
-
-Introduced separation between:
-
-* Parent (view-only)
-* Coach/Admin (manages data)
-
----
-
-## 📈 Outcome
-
-* Fully functional multi-screen iOS app
-* Clean and scalable architecture
-* Production-level UI quality
-* Strong portfolio project for mobile roles
-
----
-
-## 🔮 Next Steps
-
-* Backend integration (Firebase / REST API)
+* Backend integration (Node.js / Firebase)
+* Real authentication system
+* Coach/Admin dashboard
 * Push notifications
-* Real authentication
-* Payment integration
-* Calendar sync
+* Stripe payment integration
+* Email confirmation flow
+* AI-based training insights
 
 ---
 
-## 👩‍💻 About Me
+## 💼 Portfolio Value
+
+This project demonstrates:
+
+* Real-world product thinking
+* Clean UI architecture
+* State management
+* Role-based UX decisions
+* Scalable mobile app structure
+
+---
+
+## 👩‍💻 Author
 
 **Irina S.**
-Junior Mobile / Web Developer
+iOS & Web Developer
 
-📍 Mississauga, ON
-🎯 Actively seeking internship / junior roles
+📍 Mississauga, ON, Canada
 
 ---
+
+## ⭐️ Notes
+
+This app is built as a **portfolio-level production simulation**, focusing on both technical implementation and product design thinking.
+
