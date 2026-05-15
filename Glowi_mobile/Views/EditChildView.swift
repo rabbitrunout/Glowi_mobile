@@ -166,9 +166,11 @@ private extension EditChildView {
             return
         }
 
-        dashboardVM.child.name = trimmedName
-        dashboardVM.child.age = ageValue
-        dashboardVM.child.level = trimmedLevel
+        dashboardVM.updateSelectedChild(
+            name: trimmedName,
+            age: ageValue,
+            level: trimmedLevel
+        )
 
         showSavedToast = true
 

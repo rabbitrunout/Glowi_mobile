@@ -13,6 +13,7 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordHidden = true
+    @State private var showRegister = false
 
     var body: some View {
         GeometryReader { geo in
@@ -39,6 +40,10 @@ struct LoginView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(isPresented: $showRegister) {
+                RegisterView()
+                    .environmentObject(auth)
+            }
             .onAppear {
                 withAnimation(.easeOut(duration: 0.60)) {
                     animateHero = true
@@ -143,7 +148,7 @@ private extension LoginView {
 
     var formSection: some View {
         GlowiCard {
-            VStack(spacing: 18) {
+            VStack(spacing: 14) {
                 emailField
                 passwordField
 
@@ -152,10 +157,25 @@ private extension LoginView {
                 }
 
                 HStack {
-                    Spacer()
-                    GlowiGhostButton(title: "Forgot password?") {
+                        Spacer()
+                        GlowiGhostButton(title: "Forgot password?") {
+                        }
                     }
-                }
+
+                    HStack(spacing: 4) {
+                        Text("Don’t have an account?")
+                            .font(.system(size: 14))
+                            .foregroundColor(Theme.textSecondary)
+
+                        Button {
+                            showRegister = true
+                        } label: {
+                            Text("Sign up")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Theme.pinkDark)
+                        }
+                        .buttonStyle(.plain)
+                    }
             }
         }
         .padding(.top, 12)

@@ -15,6 +15,7 @@ struct Event: Identifiable, Hashable, Codable {
     var time: String
     var location: String
     var type: String
+    var childId: Int? = nil
 }
 
 struct TrainingSession: Identifiable, Hashable, Codable {
@@ -23,6 +24,7 @@ struct TrainingSession: Identifiable, Hashable, Codable {
     var date: String
     var time: String
     var coach: String
+    var childId: Int? = nil
 }
 
 struct Payment: Identifiable, Hashable, Codable {
@@ -30,15 +32,10 @@ struct Payment: Identifiable, Hashable, Codable {
     var month: String
     var amount: String
     var status: String
-
-    // "training" or "competition"
     var category: String
-
-    // only for competition fee
     var eventId: Int?
-
-    // payment deadline
     var dueDate: String
+    var childId: Int? = nil
 }
 
 struct Achievement: Identifiable, Hashable, Codable {
@@ -46,6 +43,7 @@ struct Achievement: Identifiable, Hashable, Codable {
     var title: String
     var date: String
     var place: String
+    var childId: Int? = nil
 }
 
 struct GlowiNotification: Identifiable, Hashable, Codable {
@@ -76,7 +74,6 @@ struct CalendarItem: Identifiable, Hashable {
     var date: String
     var time: String
     var subtitle: String
-    var type: String // "training", "competition", "event", "payment"
+    var type: String
     var relatedEventId: Int?
 }
-

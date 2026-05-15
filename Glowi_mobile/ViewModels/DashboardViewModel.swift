@@ -11,13 +11,29 @@ enum LoadingState {
 }
 
 final class DashboardViewModel: ObservableObject {
-    @Published var child = Child(
-        id: 0,
-        name: "",
-        age: 0,
-        level: "",
-        nextTraining: ""
-    )
+    @Published var children: [Child] = []
+    @Published var selectedChildId: Int = 0
+    
+    func updateSelectedChild(name: String, age: Int, level: String) {
+        guard let index = children.firstIndex(where: { $0.id == selectedChildId }) else { return }
+
+        children[index].name = name
+        children[index].age = age
+        children[index].level = level
+
+        saveCurrentData()
+    }
+
+    var selectedChild: Child {
+        children.first(where: { $0.id == selectedChildId })
+        ?? children.first
+        ?? Child(id: 0, name: "", age: 0, level: "", nextTraining: "")
+    }
+
+    // временная совместимость, чтобы старые экраны не сломались
+    var child: Child {
+        selectedChild
+    }
 
     @Published var childPhoto: UIImage? = nil
     @Published var events: [Event] = []
@@ -54,7 +70,8 @@ final class DashboardViewModel: ObservableObject {
     }
 
     private func apply(appData: AppData) {
-        child = appData.child
+        children = appData.children
+        selectedChildId = appData.selectedChildId
         events = appData.events
         sessions = appData.sessions
         payments = appData.payments
@@ -69,7 +86,8 @@ final class DashboardViewModel: ObservableObject {
 
     func saveCurrentData() {
         let data = AppData(
-            child: child,
+            children: children,
+            selectedChildId: selectedChildId,
             events: events,
             sessions: sessions,
             payments: payments,
@@ -78,6 +96,34 @@ final class DashboardViewModel: ObservableObject {
         )
 
         LocalDataStore.shared.save(data)
+    }
+    func selectChild(_ childId: Int) {
+        selectedChildId = childId
+        saveCurrentData()
+    }
+   
+
+    func addChild(name: String, age: Int, level: String) {
+        let newId = (children.map(\.id).max() ?? 0) + 1
+
+        let newChild = Child(
+            id: newId,
+            name: name,
+            age: age,
+            level: level,
+            nextTraining: "No training scheduled"
+        )
+
+        children.append(newChild)
+        selectedChildId = newId
+
+        addNotification(
+            title: "Child profile added",
+            message: "\(name) was added to your account.",
+            type: "account"
+        )
+
+        saveCurrentData()
     }
 
     // MARK: - Calendar

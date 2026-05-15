@@ -9,13 +9,16 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject var auth: AuthViewModel
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
 
     var body: some View {
-        if auth.isLoggedIn {
-            MainTabView()
-        } else {
-            NavigationStack {
+        NavigationStack {
+            if auth.isLoggedIn {
+                MainTabView()
+            } else if hasSeenOnboarding {
                 WelcomeView()
+            } else {
+                OnboardingView()
             }
         }
     }

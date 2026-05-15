@@ -47,4 +47,9 @@ final class AuthViewModel: ObservableObject {
         self.role = .parent
         self.isLoggedIn = false
     }
+    
+    func register(email: String, password: String) {
+        self.email = email
+        self.isLoggedIn = true
+    }
 }

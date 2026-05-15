@@ -97,7 +97,7 @@ private extension WelcomeView {
             .buttonStyle(.plain)
 
             NavigationLink {
-                LoginView()
+                RegisterView()
             } label: {
                 Text("Create an account")
                     .font(.system(size: 17, weight: .medium))
