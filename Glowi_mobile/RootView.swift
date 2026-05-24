@@ -9,16 +9,30 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject var auth: AuthViewModel
-    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding = false
 
     var body: some View {
         NavigationStack {
-            if auth.isLoggedIn {
-                MainTabView()
-            } else if hasSeenOnboarding {
-                WelcomeView()
-            } else {
+            if !hasSeenOnboarding {
                 OnboardingView()
+            } else if !auth.isLoggedIn {
+                WelcomeView()
+            } else if !auth.hasSelectedRole {
+                RoleSelectionView()
+            } else {
+                switch auth.role {
+                case .parent:
+                    MainTabView()
+
+                case .athlete:
+                    ChildProgressView()
+
+                case .coach:
+                    CoachDashboardView()
+
+                case .admin:
+                    AdminDashboardView()
+                }
             }
         }
     }

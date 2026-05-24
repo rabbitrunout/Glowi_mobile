@@ -58,7 +58,7 @@ struct ConfirmPaymentSheet: View {
                 .background(Theme.elevatedSurface)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Theme.stroke, lineWidth: 1)
+                        .stroke(Color.white.opacity(0.7), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
 

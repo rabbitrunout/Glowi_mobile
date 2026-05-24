@@ -77,3 +77,51 @@ struct CalendarItem: Identifiable, Hashable {
     var type: String
     var relatedEventId: Int?
 }
+
+struct SuggestedCompetition: Identifiable, Hashable, Codable {
+    let id: Int
+    var childId: Int
+    var title: String
+    var date: String
+    var location: String
+    var level: String
+    var apparatus: [String]
+    var entryFee: String
+    var coachFee: String
+    var deadline: String
+    var coachNote: String
+    var status: String // Suggested, Accepted, Paid, Declined
+}
+
+struct ResultItem: Identifiable, Hashable, Codable {
+    let id: Int
+    var childId: Int
+    var competition: String
+    var date: String
+    var apparatus: String // Free, Hoop, Ball, Clubs, Ribbon
+    var place: String
+    var score: String
+    var difficulty: String
+    var artistry: String
+    var execution: String
+    var deduction: String
+    var coachNote: String
+}
+
+struct ProgressStat: Identifiable, Hashable, Codable {
+    let id: Int
+    var title: String
+    var value: String
+    var icon: String
+}
+
+struct RegisteredCompetition: Identifiable, Hashable, Codable {
+    let id: Int
+    var childId: Int
+    var title: String
+    var date: String
+    var location: String
+    var level: String
+    var apparatus: [String]
+    var status: String
+}

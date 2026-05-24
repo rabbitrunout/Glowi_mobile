@@ -1,10 +1,3 @@
-//
-//  AppData.swift
-//  Glowi_mobile
-//
-//  Created by Irina Saf on 2026-04-02.
-//
-
 import Foundation
 
 struct AppData: Codable {
@@ -15,6 +8,10 @@ struct AppData: Codable {
     var payments: [Payment]
     var achievements: [Achievement]
     var notifications: [GlowiNotification]
+    var suggestedCompetitions: [SuggestedCompetition]
+    var recentResults: [ResultItem]
+    var progressStats: [ProgressStat]
+    var registeredCompetitions: [RegisteredCompetition]
 
     enum CodingKeys: String, CodingKey {
         case child
@@ -25,6 +22,10 @@ struct AppData: Codable {
         case payments
         case achievements
         case notifications
+        case suggestedCompetitions
+        case recentResults
+        case progressStats
+        case registeredCompetitions
     }
 
     init(
@@ -34,7 +35,11 @@ struct AppData: Codable {
         sessions: [TrainingSession],
         payments: [Payment],
         achievements: [Achievement],
-        notifications: [GlowiNotification] = []
+        notifications: [GlowiNotification] = [],
+        suggestedCompetitions: [SuggestedCompetition] = [],
+        recentResults: [ResultItem] = [],
+        progressStats: [ProgressStat] = [],
+        registeredCompetitions: [RegisteredCompetition] = []
     ) {
         self.children = children
         self.selectedChildId = selectedChildId
@@ -43,12 +48,15 @@ struct AppData: Codable {
         self.payments = payments
         self.achievements = achievements
         self.notifications = notifications
+        self.suggestedCompetitions = suggestedCompetitions
+        self.recentResults = recentResults
+        self.progressStats = progressStats
+        self.registeredCompetitions = registeredCompetitions
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // 👶 поддержка старого формата (child) и нового (children)
         if let decodedChildren = try container.decodeIfPresent([Child].self, forKey: .children) {
             children = decodedChildren
         } else if let legacyChild = try container.decodeIfPresent(Child.self, forKey: .child) {
@@ -66,9 +74,13 @@ struct AppData: Codable {
         payments = try container.decodeIfPresent([Payment].self, forKey: .payments) ?? []
         achievements = try container.decodeIfPresent([Achievement].self, forKey: .achievements) ?? []
         notifications = try container.decodeIfPresent([GlowiNotification].self, forKey: .notifications) ?? []
+
+        suggestedCompetitions = try container.decodeIfPresent([SuggestedCompetition].self, forKey: .suggestedCompetitions) ?? []
+        recentResults = try container.decodeIfPresent([ResultItem].self, forKey: .recentResults) ?? []
+        progressStats = try container.decodeIfPresent([ProgressStat].self, forKey: .progressStats) ?? []
+        registeredCompetitions = try container.decodeIfPresent([RegisteredCompetition].self, forKey: .registeredCompetitions) ?? []
     }
 
-    // ✅ ОБЯЗАТЕЛЬНО для Codable
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -79,5 +91,10 @@ struct AppData: Codable {
         try container.encode(payments, forKey: .payments)
         try container.encode(achievements, forKey: .achievements)
         try container.encode(notifications, forKey: .notifications)
+
+        try container.encode(suggestedCompetitions, forKey: .suggestedCompetitions)
+        try container.encode(recentResults, forKey: .recentResults)
+        try container.encode(progressStats, forKey: .progressStats)
+        try container.encode(registeredCompetitions, forKey: .registeredCompetitions)
     }
 }

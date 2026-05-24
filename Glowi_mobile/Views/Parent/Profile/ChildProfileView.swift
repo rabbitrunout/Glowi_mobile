@@ -144,7 +144,7 @@ private extension ChildProfileView {
                 .frame(width: 74, height: 74)
                 .overlay(
                     Circle()
-                        .stroke(Theme.stroke, lineWidth: 1)
+                        .stroke(Color.white.opacity(0.7), lineWidth: 1)
                 )
 
             if let image = dashboardVM.childPhoto {
@@ -194,7 +194,7 @@ private extension ChildProfileView {
         .background(Color.white.opacity(0.72))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
@@ -230,7 +230,7 @@ private extension ChildProfileView {
         .background(Color.white.opacity(0.72))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }

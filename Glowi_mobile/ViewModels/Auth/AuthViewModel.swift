@@ -8,17 +8,11 @@
 import Foundation
 import Combine
 
-enum UserRole {
-    case parent
-    case admin
-}
-
 final class AuthViewModel: ObservableObject {
     @Published var isLoggedIn: Bool = false
     @Published var email: String = ""
-
-    // По умолчанию приложение открывается как parent
     @Published var role: UserRole = .parent
+    @Published var hasSelectedRole: Bool = false
 
     var isAdmin: Bool {
         role == .admin
@@ -32,24 +26,26 @@ final class AuthViewModel: ObservableObject {
     func login(email: String, password: String) {
         self.email = email
         self.isLoggedIn = true
+        self.hasSelectedRole = false
+        self.role = .parent
+    }
 
-        // Временно для теста:
-        // если email содержит admin — будет админ
-        if email.lowercased().contains("admin") {
-            self.role = .admin
-        } else {
-            self.role = .parent
-        }
+    func register(email: String, password: String) {
+        self.email = email
+        self.isLoggedIn = true
+        self.hasSelectedRole = false
+        self.role = .parent
+    }
+
+    func selectRole(_ role: UserRole) {
+        self.role = role
+        self.hasSelectedRole = true
     }
 
     func logout() {
         self.email = ""
         self.role = .parent
+        self.hasSelectedRole = false
         self.isLoggedIn = false
-    }
-    
-    func register(email: String, password: String) {
-        self.email = email
-        self.isLoggedIn = true
     }
 }

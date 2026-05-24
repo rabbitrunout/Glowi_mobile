@@ -16,8 +16,17 @@ enum Theme {
     static let card = Color(hex: "#FFF8F4")
     static let softSurface = Color(hex: "#FCF6F2")
     static let elevatedSurface = Color.white.opacity(0.72)
+    
+    static let cardGradient = LinearGradient(
+        colors: [
+            Color.white.opacity(0.92),
+            Color.white.opacity(0.78)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 
-    // MARK: - Brand colors
+    // MARK: - Brand Colors
     static let pink = Color(hex: "#EFB6B6")
     static let pinkDark = Color(hex: "#E28F95")
 
@@ -33,6 +42,64 @@ enum Theme {
     static let peach = Color(hex: "#F3C8BC")
     static let lavender = Color(hex: "#DCCFE8")
     static let cream = Color(hex: "#F9F2EC")
+
+    // MARK: - Role Colors
+
+    // Parent App — warm, family, payments, care
+    static let parentAccent = pinkDark
+    static let parentSoft = pink.opacity(0.16)
+    static let parentGradient = LinearGradient(
+        colors: [
+            Color(hex: "#F8D7D2"),
+            Color(hex: "#EFB6B6"),
+            Color(hex: "#FFF1ED")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Athlete / Child View — playful, progress, motivation
+    static let athleteAccent = Color(hex: "#9B7BC7")
+    static let athleteSoft = lavender.opacity(0.22)
+    static let athleteGradient = LinearGradient(
+        colors: [
+            Color(hex: "#EADDF5"),
+            Color(hex: "#F4D6E8"),
+            Color(hex: "#FFF1F5")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Coach Portal — professional, operational, results
+    static let coachAccent = blueDark
+    static let coachSoft = blue.opacity(0.18)
+    static let coachGradient = LinearGradient(
+        colors: [
+            Color(hex: "#DCECF7"),
+            Color(hex: "#EAF4FB"),
+            Color(hex: "#FFFFFF")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Admin Dashboard — secure, system, permissions
+    static let adminAccent = Color(hex: "#4F9B75")
+    static let adminSoft = Color(hex: "#DCEFE5")
+    static let adminGradient = LinearGradient(
+        colors: [
+            Color(hex: "#E6F4EC"),
+            Color(hex: "#F4FAF6"),
+            Color(hex: "#FFFFFF")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Public Rankings — public results / verified data
+    static let rankingAccent = yellowDark
+    static let rankingSoft = yellow.opacity(0.20)
 
     // MARK: - Text
     static let textPrimary = Color(hex: "#4A3F3A")
@@ -96,7 +163,7 @@ enum Theme {
         endPoint: .bottomTrailing
     )
 
-    // MARK: - Layout tokens
+    // MARK: - Layout Tokens
     static let screenPadding: CGFloat = 20
     static let cardPadding: CGFloat = 20
     static let sectionSpacing: CGFloat = 16
@@ -107,12 +174,36 @@ enum Theme {
     static let radiusXLarge: CGFloat = 24
     static let radiusHero: CGFloat = 28
 
-    // MARK: - Backward compatibility
+    // MARK: - Backward Compatibility
     static let cyan = Theme.blue
     static let cyanDark = Theme.blueDark
     static let gold = Theme.yellow
 }
 
+// MARK: - Role Helper
+enum AppRole {
+    case parent
+    case athlete
+    case coach
+    case admin
+}
+
+extension Theme {
+    static func accent(for role: AppRole) -> Color {
+        switch role {
+        case .parent:
+            return parentAccent
+        case .athlete:
+            return athleteAccent
+        case .coach:
+            return coachAccent
+        case .admin:
+            return adminAccent
+        }
+    }
+}
+
+// MARK: - HEX Support
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -154,4 +245,13 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
+    
+    static let cardGradient = LinearGradient(
+        colors: [
+            Color.white.opacity(0.92),
+            Color.white.opacity(0.78)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 }

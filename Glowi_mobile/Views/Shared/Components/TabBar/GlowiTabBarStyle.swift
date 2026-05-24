@@ -26,7 +26,7 @@ struct GlowiFloatingTabBackground: View {
             .fill(Color.white.opacity(0.88))
             .overlay(
                 RoundedRectangle(cornerRadius: 28)
-                    .stroke(Theme.stroke, lineWidth: 1)
+                    .stroke(Color.white.opacity(0.7), lineWidth: 1)
             )
             .shadow(color: Theme.shadow, radius: 16, x: 0, y: 8)
             .frame(height: 76)

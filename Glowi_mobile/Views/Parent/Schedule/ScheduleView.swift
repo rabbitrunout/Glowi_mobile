@@ -237,7 +237,7 @@ private extension ScheduleView {
         .background(Theme.elevatedSurface)
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
@@ -268,7 +268,7 @@ private extension ScheduleView {
         .background(Theme.card.opacity(0.96))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: Theme.shadow.opacity(0.8), radius: 14, x: 0, y: 8)

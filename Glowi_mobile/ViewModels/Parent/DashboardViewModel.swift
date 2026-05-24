@@ -41,6 +41,96 @@ final class DashboardViewModel: ObservableObject {
     @Published var payments: [Payment] = []
     @Published var achievements: [Achievement] = []
     @Published var notifications: [GlowiNotification] = []
+    @Published var suggestedCompetitions: [SuggestedCompetition] = [
+
+        SuggestedCompetition(
+            id: 1,
+            childId: 1,
+            title: "Koop Cup 2026",
+            date: "Apr 26",
+            location: "Markham Pan Am Centre",
+            level: "Level 4B",
+            apparatus: ["Free", "Ball", "Clubs"],
+            entryFee: "$140",
+            coachFee: "$60",
+            deadline: "Apr 10",
+            coachNote: "Good competition for consistency before Provincials.",
+            status: "Suggested"
+        ),
+
+        SuggestedCompetition(
+            id: 2,
+            childId: 1,
+            title: "Ontario Championships",
+            date: "May 18",
+            location: "Toronto",
+            level: "National",
+            apparatus: ["Hoop", "Ball", "Ribbon"],
+            entryFee: "$180",
+            coachFee: "$90",
+            deadline: "May 1",
+            coachNote: "Main event of the season.",
+            status: "Suggested"
+        )
+    ]
+    
+    @Published var registeredCompetitions: [RegisteredCompetition] = []
+
+    @Published var recentResults: [ResultItem] = [
+
+        ResultItem(
+            id: 1,
+            childId: 1,
+            competition: "Koop Cup 2026",
+            date: "Apr 26",
+            apparatus: "Free",
+            place: "1st Place 🥇",
+            score: "18.450",
+            difficulty: "4.400",
+            artistry: "7.000",
+            execution: "7.050",
+            deduction: "-0.00",
+            coachNote: "Excellent expression and clean routine."
+        ),
+
+        ResultItem(
+            id: 2,
+            childId: 1,
+            competition: "Provincial Qualifier",
+            date: "Mar 15",
+            apparatus: "Ball",
+            place: "3rd Place 🥉",
+            score: "16.800",
+            difficulty: "3.900",
+            artistry: "6.500",
+            execution: "6.400",
+            deduction: "-0.10",
+            coachNote: "Need cleaner catches."
+        )
+    ]
+
+    @Published var progressStats: [ProgressStat] = [
+        ProgressStat(
+            id: 1,
+            title: "Trainings",
+            value: "4 / 5",
+            icon: "figure.gymnastics"
+        ),
+
+        ProgressStat(
+            id: 2,
+            title: "Goals",
+            value: "3 / 4",
+            icon: "flag.fill"
+        ),
+
+        ProgressStat(
+            id: 3,
+            title: "Awards",
+            value: "12",
+            icon: "trophy.fill"
+        )
+    ]
     @Published var state: LoadingState = .loading
 
     private let childPhotoFilename = "child_photo.jpg"
@@ -125,6 +215,44 @@ final class DashboardViewModel: ObservableObject {
 
         saveCurrentData()
     }
+
+    func registerForCompetition(_ competition: SuggestedCompetition) {
+        let newPayment = Payment(
+            id: (payments.map(\.id).max() ?? 0) + 1,
+            month: competition.title,
+            amount: competition.entryFee,
+            status: "Pending",
+            category: "Competition Fee",
+            eventId: nil,
+            dueDate: competition.deadline,
+            childId: selectedChildId
+        )
+
+        payments.insert(newPayment, at: 0)
+
+        let registered = RegisteredCompetition(
+            id: Int.random(in: 1000...9999),
+            childId: selectedChildId,
+            title: competition.title,
+            date: competition.date,
+            location: competition.location,
+            level: competition.level,
+            apparatus: competition.apparatus,
+            status: "Pending Payment"
+        )
+
+        registeredCompetitions.insert(registered, at: 0)
+
+        addNotification(
+            title: "Competition Added",
+            message: "\(competition.title) registration is pending payment.",
+            type: "competition"
+        )
+
+        saveCurrentData()
+    }
+
+   
 
     // MARK: - Calendar
 
@@ -358,6 +486,45 @@ final class DashboardViewModel: ObservableObject {
             return Theme.warning
         }
     }
+    
+    
+    func addCompetitionResult(
+        competition: String,
+        date: String,
+        apparatus: String,
+        place: String,
+        score: String,
+        difficulty: String,
+        artistry: String,
+        execution: String,
+        deduction: String,
+        coachNote: String
+    ) {
+        let newResult = ResultItem(
+            id: (recentResults.map(\.id).max() ?? 0) + 1,
+            childId: selectedChildId,
+            competition: competition,
+            date: date,
+            apparatus: apparatus,
+            place: place,
+            score: score,
+            difficulty: difficulty,
+            artistry: artistry,
+            execution: execution,
+            deduction: deduction,
+            coachNote: coachNote
+        )
+
+        recentResults.insert(newResult, at: 0)
+
+        addNotification(
+            title: "New result added",
+            message: "\(competition) — \(place) • \(apparatus)",
+            type: "progress"
+        )
+
+        saveCurrentData()
+    }
 
     // MARK: - Smart Insights
 
@@ -438,13 +605,32 @@ final class DashboardViewModel: ObservableObject {
     // MARK: - AI Checklist
 
     func generateCompetitionChecklist(for event: Event) -> [CompetitionChecklistItem] {
+
         [
-            CompetitionChecklistItem(title: "Leotard"),
-            CompetitionChecklistItem(title: "Ribbon / Ball / Hoop"),
-            CompetitionChecklistItem(title: "Water bottle"),
-            CompetitionChecklistItem(title: "Hair kit"),
-            CompetitionChecklistItem(title: "Makeup / accessories"),
-            CompetitionChecklistItem(title: "Arrive by \(arrivalTime(for: event.time))")
+            CompetitionChecklistItem(
+                title: "Registration paid",
+                isChecked: true
+            ),
+
+            CompetitionChecklistItem(
+                title: "Music uploaded",
+                isChecked: true
+            ),
+
+            CompetitionChecklistItem(
+                title: "Leotard ready",
+                isChecked: true
+            ),
+
+            CompetitionChecklistItem(
+                title: "Apparatus confirmed",
+                isChecked: true
+            ),
+
+            CompetitionChecklistItem(
+                title: "Travel confirmed",
+                isChecked: false
+            )
         ]
     }
 
@@ -464,7 +650,59 @@ final class DashboardViewModel: ObservableObject {
         LocalDataStore.shared.clear()
         loadData()
     }
+    
+    func suggestCompetition(
+        title: String,
+        date: String,
+        location: String,
+        level: String,
+        apparatus: [String],
+        entryFee: String,
+        coachFee: String,
+        deadline: String,
+        coachNote: String
+    ) {
+        let newCompetition = SuggestedCompetition(
+            id: (suggestedCompetitions.map(\.id).max() ?? 0) + 1,
+            childId: selectedChildId,
+            title: title,
+            date: date,
+            location: location,
+            level: level,
+            apparatus: apparatus,
+            entryFee: entryFee,
+            coachFee: coachFee,
+            deadline: deadline,
+            coachNote: coachNote,
+            status: "Suggested"
+        )
+
+        suggestedCompetitions.insert(newCompetition, at: 0)
+
+        addNotification(
+            title: "New competition suggested",
+            message: "\(title) was recommended by coach.",
+            type: "competition"
+        )
+
+        saveCurrentData()
+    }
+    
+    func coachUpdateSelectedChildLevel(_ newLevel: String) {
+        guard let index = children.firstIndex(where: { $0.id == selectedChildId }) else { return }
+
+        children[index].level = newLevel
+
+        addNotification(
+            title: "Level updated",
+            message: "\(children[index].name)'s level was updated to \(newLevel) by coach.",
+            type: "progress"
+        )
+
+        saveCurrentData()
+    }
 }
+
 
 private extension CalendarItem {
     var dateNumberOnly: String {

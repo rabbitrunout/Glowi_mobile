@@ -213,7 +213,7 @@ private extension EventsView {
         .background(rowBackground(isDone: isDone))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
@@ -225,17 +225,17 @@ private extension EventsView {
             Divider().opacity(0.2)
 
             HStack(spacing: 8) {
-                Image(systemName: "sparkles")
+                Image(systemName: "checklist.checked")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(Theme.pinkDark)
 
-                Text("AI Checklist")
+                Text("Competition Readiness")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(Theme.textPrimary)
 
                 Spacer()
 
-                Text("\(checklist.count) items")
+                Text("\(checklist.filter { $0.isChecked }.count)/\(checklist.count) ready")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(Theme.textSecondary)
             }
@@ -257,7 +257,7 @@ private extension EventsView {
             Button {
                 selectedChecklistEvent = event
             } label: {
-                Text("View full checklist")
+                Text("Open readiness")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(Theme.pinkDark)
             }
@@ -311,7 +311,7 @@ private extension EventsView {
         .background(Theme.card.opacity(0.96))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Theme.stroke, lineWidth: 1)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: Theme.shadow.opacity(0.8), radius: 14, x: 0, y: 8)
@@ -365,7 +365,7 @@ private struct ChecklistSheetView: View {
             VStack(alignment: .leading, spacing: 18) {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("AI Checklist")
+                        Text("Competition Readiness")
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(Theme.textPrimary)
 
@@ -383,7 +383,7 @@ private struct ChecklistSheetView: View {
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(Theme.textPrimary)
                             .frame(width: 38, height: 38)
-                            .background(Color.white.opacity(0.7))
+                            .background(Theme.elevatedSurface)
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
@@ -392,8 +392,15 @@ private struct ChecklistSheetView: View {
                 VStack(spacing: 10) {
                     ForEach(dashboardVM.generateCompetitionChecklist(for: event)) { item in
                         HStack(spacing: 12) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(Theme.greenDark)
+
+                            Image(systemName: item.isChecked
+                                  ? "checkmark.circle.fill"
+                                  : "circle")
+                                .foregroundColor(
+                                    item.isChecked
+                                    ? Theme.greenDark
+                                    : Theme.textMuted
+                                )
 
                             Text(item.title)
                                 .font(.system(size: 15, weight: .medium))

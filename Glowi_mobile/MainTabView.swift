@@ -1,11 +1,14 @@
 import SwiftUI
 
 struct MainTabView: View {
+
     @EnvironmentObject var dashboardVM: DashboardViewModel
     @State private var selectedTab: Tab = .home
 
     var body: some View {
+
         ZStack {
+
             Theme.backgroundGradient
                 .ignoresSafeArea()
 
@@ -13,31 +16,36 @@ struct MainTabView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .safeAreaInset(edge: .bottom) {
+
             GlowiCustomTabBar(
                 selectedTab: $selectedTab,
                 unreadCount: dashboardVM.unreadNotificationsCount
             )
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 10)
-                .background(
-                    LinearGradient(
-                        colors: [
-                            Theme.bgBottom.opacity(0),
-                            Theme.bgBottom
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .ignoresSafeArea(edges: .bottom)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 10)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Theme.bgBottom.opacity(0),
+                        Theme.bgBottom
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
+                .ignoresSafeArea(edges: .bottom)
+            )
         }
         .animation(.easeInOut(duration: 0.18), value: selectedTab)
     }
 
+    // MARK: - Screens
+
     @ViewBuilder
     private var currentScreen: some View {
+
         switch selectedTab {
+
         case .home:
             NavigationStack {
                 DashboardView(selectedTab: $selectedTab)
@@ -50,9 +58,9 @@ struct MainTabView: View {
                     .withTabBarSafeArea()
             }
 
-        case .events:
+        case .progress:
             NavigationStack {
-                EventsView()
+                ChildProgressView()
                     .withTabBarSafeArea()
             }
 
@@ -71,36 +79,65 @@ struct MainTabView: View {
     }
 }
 
+// MARK: - Tabs
+
 enum Tab: CaseIterable {
+
     case home
     case schedule
-    case events
+    case progress
     case payments
     case account
 
     var title: String {
+
         switch self {
-        case .home: return "Home"
-        case .schedule: return "Schedule"
-        case .events: return "Events"
-        case .payments: return "Payments"
-        case .account: return "Account"
+
+        case .home:
+            return "Home"
+
+        case .schedule:
+            return "Schedule"
+
+        case .progress:
+            return "Progress"
+
+        case .payments:
+            return "Payments"
+
+        case .account:
+            return "Account"
         }
     }
 
     var assetName: String {
+
         switch self {
-        case .home: return "icon_home"
-        case .schedule: return "icon_schedule"
-        case .events: return "icon_events"
-        case .payments: return "icon_payments"
-        case .account: return "icon_account"
+
+        case .home:
+            return "icon_home"
+
+        case .schedule:
+            return "icon_schedule"
+
+        case .progress:
+            return "icon_events"
+
+        case .payments:
+            return "icon_payments"
+
+        case .account:
+            return "icon_account"
         }
     }
 }
 
+// MARK: - Safe Area
+
 private struct TabBarSafeAreaModifier: ViewModifier {
+
     func body(content: Content) -> some View {
+
         content
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 92)
@@ -109,12 +146,16 @@ private struct TabBarSafeAreaModifier: ViewModifier {
 }
 
 private extension View {
+
     func withTabBarSafeArea() -> some View {
         modifier(TabBarSafeAreaModifier())
     }
 }
 
+// MARK: - Preview
+
 #Preview {
+
     MainTabView()
         .environmentObject(AuthViewModel())
         .environmentObject(DashboardViewModel())
