@@ -6,6 +6,7 @@ struct Child: Identifiable, Hashable, Codable {
     var age: Int
     var level: String
     var nextTraining: String
+    var parentEmail: String? = nil
 }
 
 struct Event: Identifiable, Hashable, Codable {

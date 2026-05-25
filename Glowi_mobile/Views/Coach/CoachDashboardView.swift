@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CoachDashboardView: View {
     @EnvironmentObject var dashboardVM: DashboardViewModel
-
+    @EnvironmentObject var auth: AuthViewModel
     var body: some View {
         ZStack {
             Theme.backgroundGradient
@@ -22,6 +22,7 @@ struct CoachDashboardView: View {
                     toolsGrid
                     latestResultsCard
                     pendingCompetitionsCard
+                    roleActions
                 }
                 .padding(.horizontal, Theme.screenPadding)
                 .padding(.top, 12)
@@ -54,12 +55,42 @@ private extension CoachDashboardView {
             }
         }
     }
+    
+    var roleActions: some View {
+        VStack(spacing: 10) {
+            Button {
+                auth.switchRole()
+            } label: {
+                Text("Switch Role")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Theme.blueDark)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Theme.blueDark.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+
+            Button {
+                auth.logout()
+            } label: {
+                Text("Logout")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Theme.error)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Theme.error.opacity(0.10))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+        }
+        .buttonStyle(.plain)
+    }
 
     var toolsGrid: some View {
         LazyVGrid(columns: [
             GridItem(.flexible(), spacing: 12),
             GridItem(.flexible(), spacing: 12)
         ], spacing: 12) {
+
             NavigationLink {
                 CoachAddResultView()
                     .environmentObject(dashboardVM)
@@ -86,19 +117,18 @@ private extension CoachDashboardView {
             }
             .buttonStyle(.plain)
 
-            toolCard(
-                title: "Update Level",
-                subtitle: "Coach approval",
-                icon: "checkmark.seal.fill",
-                accent: Theme.greenDark
-            )
-
-            toolCard(
-                title: "Readiness",
-                subtitle: "Music, leotard, travel",
-                icon: "checklist.checked",
-                accent: Theme.yellowDark
-            )
+            NavigationLink {
+                CoachReadinessView()
+                    .environmentObject(dashboardVM)
+            } label: {
+                toolCard(
+                    title: "Readiness",
+                    subtitle: "Music, leotard, travel",
+                    icon: "checklist.checked",
+                    accent: Theme.yellowDark
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -199,6 +229,7 @@ private extension CoachDashboardView {
 #Preview {
     NavigationStack {
         CoachDashboardView()
+            .environmentObject(AuthViewModel())
             .environmentObject(DashboardViewModel())
     }
 }

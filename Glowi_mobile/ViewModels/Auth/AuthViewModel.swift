@@ -42,10 +42,17 @@ final class AuthViewModel: ObservableObject {
         self.hasSelectedRole = true
     }
 
+
+    func switchRole() {
+        self.hasSelectedRole = false
+    }
+    
     func logout() {
         self.email = ""
         self.role = .parent
         self.hasSelectedRole = false
         self.isLoggedIn = false
     }
+    
+    
 }

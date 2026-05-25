@@ -27,7 +27,7 @@ final class DashboardViewModel: ObservableObject {
     var selectedChild: Child {
         children.first(where: { $0.id == selectedChildId })
         ?? children.first
-        ?? Child(id: 0, name: "", age: 0, level: "", nextTraining: "")
+        ?? Child(id: 0, name: "", age: 0, level: "", nextTraining: "", parentEmail: nil)
     }
 
     // временная совместимость, чтобы старые экраны не сломались
@@ -201,7 +201,8 @@ final class DashboardViewModel: ObservableObject {
             name: name,
             age: age,
             level: level,
-            nextTraining: "No training scheduled"
+            nextTraining: "No training scheduled",
+            parentEmail: nil
         )
 
         children.append(newChild)
@@ -215,14 +216,43 @@ final class DashboardViewModel: ObservableObject {
 
         saveCurrentData()
     }
+    
+    func coachAddAthlete(
+        name: String,
+        age: Int,
+        level: String,
+        parentEmail: String
+    ) {
+        let newId = (children.map(\.id).max() ?? 0) + 1
+
+        let newChild = Child(
+            id: newId,
+            name: name,
+            age: age,
+            level: level,
+            nextTraining: "No training scheduled",
+            parentEmail: parentEmail
+        )
+
+        children.append(newChild)
+        selectedChildId = newId
+
+        addNotification(
+            title: "Athlete added",
+            message: "\(name) was linked to \(parentEmail).",
+            type: "account"
+        )
+
+        saveCurrentData()
+    }
 
     func registerForCompetition(_ competition: SuggestedCompetition) {
         let newPayment = Payment(
             id: (payments.map(\.id).max() ?? 0) + 1,
-            month: competition.title,
+            month: "\(competition.title) Club Fee",
             amount: competition.entryFee,
             status: "Pending",
-            category: "Competition Fee",
+            category: "Club Competition Fee",
             eventId: nil,
             dueDate: competition.deadline,
             childId: selectedChildId
@@ -238,14 +268,14 @@ final class DashboardViewModel: ObservableObject {
             location: competition.location,
             level: competition.level,
             apparatus: competition.apparatus,
-            status: "Pending Payment"
+            status: "Parent Approved • Fee Pending"
         )
 
         registeredCompetitions.insert(registered, at: 0)
 
         addNotification(
-            title: "Competition Added",
-            message: "\(competition.title) registration is pending payment.",
+            title: "Competition approved",
+            message: "\(competition.title) was approved. Club fee invoice was added.",
             type: "competition"
         )
 

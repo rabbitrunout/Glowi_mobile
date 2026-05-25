@@ -21,17 +21,18 @@ struct RootView: View {
                 RoleSelectionView()
             } else {
                 switch auth.role {
+
                 case .parent:
                     MainTabView()
 
-                case .athlete:
-                    ChildProgressView()
-
                 case .coach:
-                    CoachDashboardView()
+                    CoachMainView()
+
+                case .athlete:
+                    AthleteMainView()
 
                 case .admin:
-                    AdminDashboardView()
+                    AdminMainView()
                 }
             }
         }

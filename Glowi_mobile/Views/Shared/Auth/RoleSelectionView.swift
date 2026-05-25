@@ -8,99 +8,104 @@
 import SwiftUI
 
 struct RoleSelectionView: View {
-
     @EnvironmentObject var auth: AuthViewModel
 
     var body: some View {
-
         ZStack {
-
             Theme.backgroundGradient
                 .ignoresSafeArea()
 
-            VStack(spacing: 22) {
-
-                Spacer()
-
-                Text("Choose Your Role")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(Theme.textPrimary)
-
-                Text("Different experiences for parents, athletes, coaches, and admins.")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-
-                VStack(spacing: 16) {
-
-                    roleButton(
-                        title: "Parent App",
-                        subtitle: "Manage schedules, payments, results",
-                        icon: "person.2.fill",
-                        color: Theme.pinkDark
-                    ) {
-                        auth.selectRole(.parent)
-                    }
-
-                    roleButton(
-                        title: "Athlete View",
-                        subtitle: "Progress, awards, achievements",
-                        icon: "figure.gymnastics",
-                        color: Theme.lavender
-                    ) {
-                        auth.selectRole(.athlete)
-                    }
-
-                    roleButton(
-                        title: "Coach Portal",
-                        subtitle: "Manage athletes & competitions",
-                        icon: "person.badge.key.fill",
-                        color: Theme.blueDark
-                    ) {
-                        auth.selectRole(.coach)
-                    }
-
-                    roleButton(
-                        title: "Admin Dashboard",
-                        subtitle: "System management",
-                        icon: "shield.fill",
-                        color: Theme.greenDark
-                    ) {
-                        auth.selectRole(.admin)
-                    }
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 22) {
+                    headerSection
+                    rolesGrid
+                    footerNote
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Theme.screenPadding)
+                .padding(.top, 36)
+                .padding(.bottom, 40)
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+    }
+}
 
-                Spacer()
+private extension RoleSelectionView {
+    var headerSection: some View {
+        VStack(spacing: 10) {
+            Text("Choose your experience")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundColor(Theme.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text("Glowi adapts for parents, athletes, coaches, and admins.")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 18)
+        }
+    }
+
+    var rolesGrid: some View {
+        VStack(spacing: 14) {
+            roleCard(
+                title: "Parent App",
+                subtitle: "Schedule, payments, competitions, and updates",
+                icon: "person.2.fill",
+                accent: Theme.pinkDark
+            ) {
+                auth.selectRole(.parent)
+            }
+
+            roleCard(
+                title: "Athlete View",
+                subtitle: "Progress, awards, routines, and goals",
+                icon: "figure.gymnastics",
+                accent: Theme.athleteAccent
+            ) {
+                auth.selectRole(.athlete)
+            }
+
+            roleCard(
+                title: "Coach Portal",
+                subtitle: "Add results, suggest competitions, approve levels",
+                icon: "person.badge.key.fill",
+                accent: Theme.blueDark
+            ) {
+                auth.selectRole(.coach)
+            }
+
+            roleCard(
+                title: "Admin Dashboard",
+                subtitle: "Manage users, payments, events, and reports",
+                icon: "shield.fill",
+                accent: Theme.greenDark
+            ) {
+                auth.selectRole(.admin)
             }
         }
     }
 
-    func roleButton(
+    func roleCard(
         title: String,
         subtitle: String,
         icon: String,
-        color: Color,
+        accent: Color,
         action: @escaping () -> Void
     ) -> some View {
-
         Button(action: action) {
-
             HStack(spacing: 16) {
-
                 ZStack {
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(color.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(accent.opacity(0.15))
                         .frame(width: 58, height: 58)
 
                     Image(systemName: icon)
-                        .font(.system(size: 24))
-                        .foregroundColor(color)
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(accent)
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
-
+                VStack(alignment: .leading, spacing: 5) {
                     Text(title)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Theme.textPrimary)
@@ -108,15 +113,32 @@ struct RoleSelectionView: View {
                     Text(subtitle)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(Theme.textSecondary)
+                        .lineLimit(2)
                 }
 
                 Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Theme.textMuted)
             }
             .padding(18)
             .background(Theme.elevatedSurface)
-            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .overlay(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(Color.white.opacity(0.7), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .buttonStyle(.plain)
+    }
+
+    var footerNote: some View {
+        Text("Demo mode lets you explore all platform roles.")
+            .font(.system(size: 12, weight: .medium))
+            .foregroundColor(Theme.textMuted)
+            .multilineTextAlignment(.center)
+            .padding(.top, 4)
     }
 }
 

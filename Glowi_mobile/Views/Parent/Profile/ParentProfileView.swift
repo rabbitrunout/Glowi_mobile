@@ -388,11 +388,59 @@ private extension ParentProfileView {
             VStack(spacing: 10) {
                 actionRow(title: "Payments", assetName: "icon_payments", accent: Theme.yellowDark)
                 actionRow(title: "Schedule", assetName: "icon_schedule", accent: Theme.blueDark)
-                actionRow(title: "Events", assetName: "icon_events", accent: Theme.pinkDark)
+                
+                NavigationLink {
+                    CompetitionInvitationsView()
+                        .environmentObject(dashboardVM)
+                } label: {
+                    actionRowContent(
+                        title: "Competition Invitations",
+                        assetName: "icon_events",
+                        accent: Theme.pinkDark
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                NavigationLink {
+                    RegisteredCompetitionsView()
+                        .environmentObject(dashboardVM)
+                } label: {
+                    actionRowContent(
+                        title: "Registered Competitions",
+                        assetName: "icon_events",
+                        accent: Theme.greenDark
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                
                 actionRow(title: "Account Settings", assetName: "icon_account", accent: Theme.lavender)
                 resetDemoButton
             }
         }
+    }
+    
+    func actionRowContent(title: String, assetName: String, accent: Color) -> some View {
+        HStack(spacing: 12) {
+            iconBox(assetName: assetName, accent: accent)
+
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(Theme.textPrimary)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(Theme.textMuted)
+        }
+        .padding(14)
+        .background(Theme.elevatedSurface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.7), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     func actionRow(title: String, assetName: String, accent: Color) -> some View {
